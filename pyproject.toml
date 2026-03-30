@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jl"
+version = "0.1.0"
+description = "Minimal Jupyter Lab CLI for AI-driven remote execution"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.28.0",
+    "websockets>=13.0",
+]
+
+[project.scripts]
+jl = "jl.cli:main"
+
+[project.optional-dependencies]
+test = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/jl"]
