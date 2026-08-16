@@ -49,8 +49,9 @@ class JupyterClient:
         if r.status_code == 404:
             return None
         if not r.is_success:
+            body = r.text[:_ERR_TRUNCATE]
             raise JupyterError(
-                f"GET /api/kernels/{kernel_id} -> {r.status_code}: {r.text[:_ERR_TRUNCATE]}"
+                f"GET /api/kernels/{kernel_id} -> {r.status_code}: {body}"
             )
         return r.json()
 

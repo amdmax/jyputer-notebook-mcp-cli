@@ -9,9 +9,6 @@ from pathlib import Path
 
 import httpx
 
-_PREVIEW_WIDTH = 80  # chars of cell source shown in brief/steps output
-_ID_PREFIX_LEN = 8  # chars of kernel/session UUID shown in listings
-
 import jl.config as config_mod
 import jl.output as out
 import jl.state as state_mod
@@ -19,6 +16,9 @@ import jl.tunnel as tunnel_mod
 from jl.http_client import JupyterClient, JupyterError
 from jl.kernel import execute
 from jl.notebook import code_steps, read_cells, run_all, run_cell, run_step
+
+_PREVIEW_WIDTH = 80  # chars of cell source shown in brief/steps output
+_ID_PREFIX_LEN = 8  # chars of kernel/session UUID shown in listings
 
 
 def _emit_result(result, cfg) -> int:
@@ -152,9 +152,11 @@ def cmd_step(args, cfg, client: JupyterClient) -> int:
 
 def cmd_kernels(args, cfg, client: JupyterClient) -> int:
     for k in client.list_kernels():
-        print(
-            f"{k.get('id', '')[:_ID_PREFIX_LEN]}  {k.get('name', ''):<10}  {k.get('execution_state', ''):<10}  {k.get('last_activity', '')}"
-        )
+        kid = k.get("id", "")[:_ID_PREFIX_LEN]
+        name = k.get("name", "")
+        state = k.get("execution_state", "")
+        activity = k.get("last_activity", "")
+        print(f"{kid}  {name:<10}  {state:<10}  {activity}")
     return 0
 
 

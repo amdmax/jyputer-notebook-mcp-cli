@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from jl.http_client import JupyterClient
-from jl.kernel import execute, ExecutionResult
+from jl.kernel import ExecutionResult, execute
 
 
 def read_cells(client: JupyterClient, path: str) -> list[dict]:

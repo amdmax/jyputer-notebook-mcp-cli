@@ -5,7 +5,8 @@ Requires:
 - JUPYTER_URL env var pointing to a running Jupyter server
 - JUPYTER_TOKEN env var with the server token
 - NOTEBOOK_LOCAL env var: local path to receipt_ocr.ipynb
-- NOTEBOOK_REMOTE env var: remote path to upload to (default: invoices/notebooks/receipt_ocr.ipynb)
+- NOTEBOOK_REMOTE env var: remote path to upload to
+  (default: invoices/notebooks/receipt_ocr.ipynb)
 """
 
 import json
@@ -18,7 +19,9 @@ import pytest
 JUPYTER_URL = os.environ.get("JUPYTER_URL")
 JUPYTER_TOKEN = os.environ.get("JUPYTER_TOKEN")
 NOTEBOOK_LOCAL = Path(os.environ.get("NOTEBOOK_LOCAL", ""))
-NOTEBOOK_REMOTE = os.environ.get("NOTEBOOK_REMOTE", "invoices/notebooks/receipt_ocr.ipynb")
+NOTEBOOK_REMOTE = os.environ.get(
+    "NOTEBOOK_REMOTE", "invoices/notebooks/receipt_ocr.ipynb"
+)
 
 pytestmark = pytest.mark.skipif(
     not JUPYTER_URL or not JUPYTER_TOKEN, reason="requires live Jupyter server"
@@ -72,7 +75,7 @@ def test_ls_inbound():
     assert r.returncode == 0
     lines = r.stdout.strip().splitlines()
     assert len(lines) >= 1
-    assert all(".png" in l for l in lines)
+    assert all(".png" in line for line in lines)
 
 
 def test_upload_sets_active_notebook(uploaded_notebook):
@@ -87,9 +90,9 @@ def test_steps_shows_code_cells_only(uploaded_notebook):
     assert r.returncode == 0
     lines = r.stdout.strip().splitlines()
     # all lines must start with "step"
-    assert all(l.strip().startswith("step") for l in lines)
+    assert all(line.strip().startswith("step") for line in lines)
     # 1-based and sequential
-    numbers = [int(l.split()[1]) for l in lines]
+    numbers = [int(line.split()[1]) for line in lines]
     assert numbers == list(range(1, len(numbers) + 1))
 
 
@@ -104,12 +107,13 @@ def test_step3_config(fresh_kernel, uploaded_notebook):
     # set cwd and model override first
     jl(
         "exec",
-        "import os; os.chdir('/home/m/invoices/notebooks'); OLLAMA_MODEL='qwen2.5vl:32b'",
+        "import os; os.chdir('/home/m/invoices/notebooks'); "
+        "OLLAMA_MODEL='qwen2.5vl:32b'",
     )
     r = jl("step", "3", timeout=30)
     assert r.returncode == 0
     assert "Images:" in r.stdout
-    count_line = next(l for l in r.stdout.splitlines() if "Images:" in l)
+    count_line = next(line for line in r.stdout.splitlines() if "Images:" in line)
     count = int(count_line.split(":")[1].strip())
     assert count >= 1
 
@@ -146,7 +150,7 @@ def test_step9_parse_and_validate(fresh_kernel, uploaded_notebook):
     assert "Parsed OK" in r.stdout
     # extract JSON block and validate it parses
     lines = r.stdout.splitlines()
-    start = next(i for i, l in enumerate(lines) if l.strip() == "{")
+    start = next(i for i, line in enumerate(lines) if line.strip() == "{")
     raw = "\n".join(lines[start:])
     data = json.loads(raw)
     assert "merchant_name" in data
