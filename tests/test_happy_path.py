@@ -15,10 +15,14 @@ from pathlib import Path
 
 import pytest
 
-JUPYTER_URL = os.environ["JUPYTER_URL"]
-JUPYTER_TOKEN = os.environ["JUPYTER_TOKEN"]
+JUPYTER_URL = os.environ.get("JUPYTER_URL")
+JUPYTER_TOKEN = os.environ.get("JUPYTER_TOKEN")
 NOTEBOOK_LOCAL = Path(os.environ.get("NOTEBOOK_LOCAL", ""))
 NOTEBOOK_REMOTE = os.environ.get("NOTEBOOK_REMOTE", "invoices/notebooks/receipt_ocr.ipynb")
+
+pytestmark = pytest.mark.skipif(
+    not JUPYTER_URL or not JUPYTER_TOKEN, reason="requires live Jupyter server"
+)
 
 BASE = ["jl", "--url", JUPYTER_URL, "--token", JUPYTER_TOKEN]
 
